@@ -1,7 +1,14 @@
 # Project 3 Geospatial Analysis Project
 
 # a.- Preprocesamiento de datos para el análisis
+1
+2
+3
+4
 
+# b.- Análisis en profundidad de los restaurantes
+8
+# c.- Análsis del mejor restaurante
 <hr>
 
 <a name="schema0"></a>
@@ -121,4 +128,91 @@ df.replace('NEW',0,inplace=True)
 df.replace('-',0,inplace=True)
 df['rate']=df['rate'].astype(float)
 ~~~
-# Project-3-Geospatial-Analysis-Project
+<hr>
+
+<a name="schema5"></a>
+
+# 5 . Calcular la calificación promedio de cada restaurante
+Agrupamos por nombre y hacemos la media del `rate` y mostramos los 20 mejores
+
+~~~python
+df.groupby('name')['rate'].mean().nlargest(20).plot.bar()
+plt.savefig("./images/name.png")
+~~~
+![img](./images/name.png)
+~~~python
+df_rate=df.groupby('name')['rate'].mean().to_frame()
+df_rate=df_rate.reset_index()
+df_rate.columns=['restaurant','rating']
+df_rate.head(20)
+~~~
+<hr>
+
+<a name="schema6"></a>
+
+# 6. Dibujar la distribución del rating
+~~~python
+sns.set_style(style='whitegrid')
+sns.distplot(df_rate['rating'])
+~~~
+![img](./images/rating.png)
+
+Casi más del 50 por ciento de los restaurantes tienen una calificación de entre 3 y 4. Los restaurantes con una calificación de más de 4.5 son muy raros.
+
+<hr>
+
+<a name="schema7"></a>
+
+# 7 .¿Cuáles son las principales cadenas de restaurantes en Bangalore?
+~~~python
+plt.figure(figsize=(10,7))
+chains=df['name'].value_counts()[0:20]
+sns.barplot(x=chains,y=chains.index,palette='deep')
+plt.title("Most famous restaurants chains in Bangaluru")
+plt.xlabel("Number of outlets") 
+~~~
+![img](./images/most.png)
+
+
+<hr>
+
+<a name="schema8"></a>
+
+
+# 8. ¿Cuántos de los restaurantes no aceptan pedidos online?
+~~~python
+x=df['online_order'].value_counts()
+labels=['accepted','not accepted']
+plt.pie(x,explode=[0.0,0.1],autopct='%1.1f%%')
+~~~
+![img](./images/online.png)
+
+
+<hr>
+
+<a name="schema9"></a>
+
+# 9. ¿Cuál es la relación entre restaurantes que ofrecen y no ofrecen reserva de mesa?
+~~~python
+x=df['book_table'].value_counts()
+labels=['not book','book']
+plt.pie(x,explode=[0.0,0.1],autopct='%1.1f%%')
+~~~
+![img](./images/table.png)
+
+<hr>
+
+<a name="schema10"></a>
+
+# 10. Limpiamos los datos
+
+~~~python
+df['rest_type'].isna().sum()
+df['rest_type'].dropna(inplace=True)
+plt.figure(figsize=(20,12))
+df['rest_type'].value_counts().nlargest(20).plot.bar(color='red')
+plt.gcf().autofmt_xdate()
+plt.savefig("./images/rest_type.png")
+~~~
+![img](./images/rest_type.png)
+
