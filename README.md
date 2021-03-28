@@ -216,3 +216,52 @@ plt.savefig("./images/rest_type.png")
 ~~~
 ![img](./images/rest_type.png)
 
+
+<hr>
+
+<a name="schema11"></a>
+
+# 11. Los restaurantes mas votados y total de restaurantes en diferentes ubicaciones de Bangalore
+~~~python
+df.groupby('name')['votes'].max().nlargest(10).plot.bar()
+plt.savefig("./images/votes.png")
+~~~
+
+![img](./images/votes.png)
+
+~~~python
+df.groupby('location')['name'].unique()
+~~~
+![img](./images/009.png)
+
+
+Creamos un diccionario con las localizaciones y la cantidad de resturantes. 
+~~~python
+restaurant=[]
+location=[]
+for key,location_df in df.groupby('location'):
+    location.append(key)
+    restaurant.append(len(location_df['name'].unique()))
+df_total=pd.DataFrame(zip(location,restaurant))
+df_total.columns=['location','restaurant']
+df_total.set_index('location',inplace=True)
+df_total.sort_values(by='restaurant').tail(10)
+~~~
+![img](./images/010.png)
+
+
+~~~python
+df_total.sort_values(by='restaurant').tail(10).plot.bar()
+plt.savefig("./images/sort_rest.png")
+~~~
+![img](./images/sort_rest.png)
+
+
+
+
+
+
+
+
+
+
