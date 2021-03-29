@@ -9,6 +9,10 @@
 # b.- Análisis en profundidad de los restaurantes
 8
 # c.- Análsis del mejor restaurante
+11
+
+# d.-  Análisis de los precios de los restaruantes 
+
 <hr>
 
 <a name="schema0"></a>
@@ -257,8 +261,57 @@ plt.savefig("./images/sort_rest.png")
 ![img](./images/sort_rest.png)
 
 
+<hr>
+
+<a name="schema12"></a>
+
+# 12. Número total de variedad de restaurantes, es decir, norte de la India, sur de la India
+~~~python
+cuisines=df['cuisines'].value_counts()[:10]
+sns.barplot(cuisines,cuisines.index)
+plt.xlabel('Count')
+plt.title("Most popular cuisines of Bangalore")
+~~~
+![img](./images/cuisines.png)
+
+Comprobamos que la mayor variedad de restaurantes son `North India` y `North India Chinese`
+
+<hr>
+
+<a name="schema13"></a>
+
+# 13. Analizar costo aproximado para 2 personas
+
+Comprobamos si hay nulos, y si los hay los eliminamos.
+
+~~~python
+df["approx_cost(for two people)"].isna().sum()
+~~~
+![img](./images/011.png)
+~~~python
+df.dropna(axis='index',subset=['approx_cost(for two people)'],inplace=True)
+~~~
+Como los dastos son `object` los converitmos a `int`, primero les quitamos las comas y después los pasamos a `int`. Los podemos pasar a `int` porque hemos comprobado que no hay ningún dato tenga decimales.
+
+~~~python
 
 
+df['approx_cost(for two people)'] = df['approx_cost(for two people)'].apply(lambda x: x.replace(',',''))
+df['approx_cost(for two people)']=df['approx_cost(for two people)'].astype(int)
+~~~
+<hr>
+
+<a name="schema14"></a>
+
+# 14.  Gasto vs rating
+
+~~~python
+plt.figure(figsize=(10,7))
+sns.scatterplot(x="rate",y='approx_cost(for two people)',hue='online_order',data=df)
+plt.show()
+
+~~~
+![img](./images/costvsrating.png)
 
 
 
