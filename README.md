@@ -1,24 +1,42 @@
 # Project 3 Geospatial Analysis Project
 
+0. [INFO  del dataset](#schema0)
 # a.- Preprocesamiento de datos para el análisis
-1
-2
-3
-4
+1. [Importar librerías y cargar los datos](#schema1)
+2. [Limpiar el data set](#schema2)
+3. [Obtener las datos con NAN](#schema3)
+4. [Vamos a modificar la columna rate, quitandole los nulos y variando su formatos](#schema4)
 
 # b.- Análisis en profundidad de los restaurantes
-8
+5. [Calcular la calificación promedio de cada restaurante](#schema5)
+6. [Dibujar la distribución del rating](#schema6)
+7. [¿Cuáles son las principales cadenas de restaurantes en Bangalore?](#schema7)
+8. [¿Cuántos de los restaurantes no aceptan pedidos online?](#schema8)
+
 # c.- Análsis del mejor restaurante
-11
+9. [¿Cuál es la relación entre restaurantes que ofrecen y no ofrecen reserva de mesa?](#schema9)
+10. [Limpiamos los datos](#schema10)
+11. [Los restaurantes mas votados y total de restaurantes en diferentes ubicaciones de Bangalore](#schema11)
+12. [Número total de variedad de restaurantes, es decir, norte de la India, sur de la India](#schema12)
+13. [Analizar costo aproximado para 2 personas](#schema13)
+14. [Gasto vs rating](#schema14)
+15. [¿Hay alguna diferencia entre los votos de los restaurantes que aceptan y no aceptan pedidos en línea?](#schema15)
 
 # d.-  Análisis de los precios de los restaruantes 
-16
+16. [¿Existe alguna diferencia entre el precio y el precio de los restaurantes que aceptan y no aceptan pedidos en línea?](#schema16)
+17. [Encontrar los restaurantes más lujosos](#schema17)
+18. [Top ten de restaurantes](#schema18)
+19. [Todos los restaurantes que están por debajo de 500 ](#schema19)
 
 # e.- Análisis del restaurante
-20
+20. [Restaurantes que tienen una mejor calificación> 4 y que también están por debajo del presupuesto](#schema20)
+21. [Total de varios hoteles asequibles en diferentes ubicaciones](#schema21)
+22. [Encontrar los mejores restaurantes económicos en cualquier lugar](#schema22)
 
 # f.- Análisis geográfico
-
+23. [Análisis geográfico](#schema23)
+# g.- Análisis del mas populares cocinas 
+24. [¿Cuáles son las cadenas de restaurantes de comida informal más populares?](#schema24)
 
 
 <hr>
@@ -80,7 +98,7 @@ df=pd.read_csv('./data/zomato.csv')
 
 <a name="schema2"></a>
 
-# 2. Limpiar el data set
+# 2. Limpiar el data set 
 ~~~pyhton
 df.shape
 df.dtypes
@@ -487,6 +505,9 @@ plt.savefig("./images/loc.png")
 ![img](./images/loc.png)
 
 
+<hr>
+
+<a name="schema23"></a>
 
 # 23 .- análisis geográfico
 
@@ -558,3 +579,22 @@ Creamos un `heatmap`
 ~~~python
 HeatMap(Restaurant_locations[['lat','lon','count']].values.tolist(),zoom=20,radius=15).add_to(basemap)
 ~~~
+
+
+<hr>
+
+<a name="schema24"></a>
+
+# 24. ¿Cuáles son las cadenas de restaurantes de comida informal más populares?
+~~~python
+df_1=df.groupby(['rest_type','name']).agg('count')
+datas=df_1.sort_values(['url'],ascending=False).groupby(['rest_type'],
+                as_index=False).apply(lambda x : x.sort_values(by="url",ascending=False).head(3))['url'].reset_index().rename(columns={'url':'count'})
+~~~
+
+![img](./images/022.png)
+
+~~~python
+casual=dataset[dataset['rest_type']=='Casual Dining']
+~~~
+![img](./images/023.png)
