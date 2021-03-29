@@ -395,7 +395,7 @@ Hacemos una copia de los datos y ponemos de índice a la columna `name`
 data = df.copy()
 data.set_index('name',inplace=True)
 ~~~
-![img](./images.013.png)
+![img](./images/013.png)
 
 Los 10 restaurantes más baratos con un costo aproximado para 2 personas
 ~~~python
