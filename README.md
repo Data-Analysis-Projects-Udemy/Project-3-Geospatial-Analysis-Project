@@ -12,6 +12,14 @@
 11
 
 # d.-  Análisis de los precios de los restaruantes 
+16
+
+# e.- Análisis del restaurante
+20
+
+# f.- Análisis geográfico
+
+
 
 <hr>
 
@@ -311,10 +319,242 @@ sns.scatterplot(x="rate",y='approx_cost(for two people)',hue='online_order',data
 plt.show()
 
 ~~~
-![img](./images/costvsrating.png)
+A partir de este diagrama de dispersión, podemos llegar a la conclusión de que la mayoría de las personas con las calificaciones más altas aceptan pedidos en línea y también están presupuestados.
+
+<hr>
+
+<a name="schema15"></a>
+
+
+# 15. ¿Hay alguna diferencia entre los votos de los restaurantes que aceptan y no aceptan pedidos en línea?
+
+~~~python
+sns.boxplot(x='online_order',y='votes',data=df)
+~~~
+
+![img](./images/boxplot.png)
+
+A partir de este diagrama de caja, podemos observar que la mediana del número de votos para ambas categorías varía.
+Los restaurantes que aceptan pedidos en línea obtienen más votos de los clientes, ya que hay una opción de calificación que aparece después de cada pedido a través de la aplicación zomato.
+
+<hr>
+
+<a name="schema16"></a>
+
+# 16 . ¿Existe alguna diferencia entre el precio y el precio de los restaurantes que aceptan y no aceptan pedidos en línea?
+~~~python
+sns.boxplot(x='online_order',y='approx_cost(for two people)',data=df)
+~~~
+![img](./images/boxplot2.png)
+
+Los restaurantes que aceptan pedidos en línea son más asequibles que los restaurantes que no aceptan pedidos en línea
+
+<hr>
+
+<a name="schema17"></a>
+
+# 17. Encontrar los restaurantes más lujosos
+~~~python
+df['approx_cost(for two people)'].min()
+df['approx_cost(for two people)'].max()
+~~~
+El mínimo es `40` y el máximo es `6000`
+
+~~~python
+df[df['approx_cost(for two people)']==6000]["name"]
+~~~
+![img](./images/012.png)
+
+Hay solo dos restaruantes 
+
+<hr>
+
+<a name="schema18"></a>
+
+# 18. Top ten de restaurantes
+Hacemos una copia de los datos y ponemos de índice a la columna `name`
+~~~python
+data = df.copy()
+data.set_index('name',inplace=True)
+~~~
+![img](./images.013.png)
+
+Los 10 restaurantes más baratos con un costo aproximado para 2 personas
+~~~python
+data['approx_cost(for two people)'].nsmallest(10)
+data['approx_cost(for two people)'].nsmallest(10).plot.bar()
+plt.savefig("./images/cheap.png")
+~~~
+
+![img](./images/cheap.png)
+
+Los 10 restaurantes más baratos en cuanto a ubicación con un costo aproximado para 2 personas
+~~~python
+data.set_index('location',inplace=True)
+data['approx_cost(for two people)'].nsmallest(10)
+data['approx_cost(for two people)'].nsmallest(10).plot.bar()
+~~~
+![img](./images/cheap_loc.png)
+
+Los 10 restaurantes más caros con un costo aproximado para 2 personas
+
+~~~python
+data_e['approx_cost(for two people)'].nlargest(10).plot.bar()
+plt.savefig("./images/expens.png")
+~~~
+
+![img](./images/expens.png)
+
+<hr>
+
+<a name="schema19"></a>
+
+# 19. Todos los restaurantes que están por debajo de 500 
+~~~python
+data_e[data_e['approx_cost(for two people)']<=500]
+~~~
+![img](./images/014.png)
+
+~~~python
+df_budget=data[data['approx_cost(for two people)']<=500].loc[:,('approx_cost(for two people)')]
+df_budget=df_budget.reset_index()
+df_budget.head()
+~~~
+![img](./images/015.png)
+
+~~~python
+df_budget['approx_cost(for two people)'].value_counts().plot.bar()
+~~~
+![img](./images/budget.png)
+
+<hr>
+
+<a name="schema20"></a>
+
+# 20. Restaurantes que tienen una mejor calificación> 4 y que también están por debajo del presupuesto
+
+nº total. de los restaurantes que tienen una mejor calificación> 4 y que también están por debajo del presupuesto, es decir, menos de 500
+
+~~~python
+df[(df['rate']>=4) & (df['approx_cost(for two people)']<=500)].shape
+df_new=df[(df['rate']>=4) & (df['approx_cost(for two people)']<=500)]
+len(df_new['name'].unique())
+~~~
+Nos quedamos con 628 restaurantes que lo cumplen.
+
+<hr>
+
+<a name="schema21"></a>
+
+# 21 .- Total de varios hoteles asequibles en diferentes ubicaciones
+
+~~~python
+location=[]
+total=[]
+for loc,location_df in df_new.groupby('location'):
+    location.append(loc)
+    total.append(len(location_df['name'].unique()))
+location_df=pd.DataFrame(zip(location,total))
+location_df.columns=['location','restaurant']
+location_df.set_index('location',inplace=True)
+~~~
+![img](./images/016.png)
+
+~~~python
+location_df['restaurant'].nlargest(10).plot.bar()
+plt.gcf().autofmt_xdate()
+plt.ylabel('Total restaurants')
+plt.savefig("./images/total_rest.png")
+~~~
+![img](./images/total_rest.png)
+
+<hr>
+
+<a name="schema22"></a>
+
+# 22 .- Encontrar los mejores restaurantes económicos en cualquier lugar
+
+~~~python
+def return_budget(location,restaurant):
+    budget=df[(df['approx_cost(for two people)']<=400) & (df['location']==location) & 
+                     (df['rate']>4) & (df['rest_type']==restaurant)]
+    return(budget['name'].unique())
+plt.figure(figsize=(10,7))
+Restaurant_locations=df['location'].value_counts()[:20]
+sns.barplot(Restaurant_locations,Restaurant_locations.index)
+plt.savefig("./images/loc.png")
+~~~
+![img](./images/loc.png)
 
 
 
+# 23 .- análisis geográfico
+
+Necesito Latitudes y longitudes para cada lugar para el análisis de datos geográficos, así que para obtener lat, lon de cada lugar, use Geopy
+
+~~~python
+locations=pd.DataFrame({"Name":df['location'].unique()})
+locations['new_Name']='Bangalore '+locations['Name']
+~~~
+![img](./images/017.png)
+
+Importamos y recorriendo los valores de `locations`obtenemos los valores de logitud y latitud
+~~~python
+from geopy.geocoders import Nominatim
+
+lat_lon=[]
+geolocator=Nominatim(user_agent="app")
+for location in locations['Name']:
+    location = geolocator.geocode(location, timeout = 10000)
+    if location is None:
+        lat_lon.append(np.nan)
+    else:    
+        geo=(location.latitude,location.longitude)
+        lat_lon.append(geo)
 
 
+locations['geo_loc']=lat_lon
+~~~
+![img](./images/018.png)
 
+Creamos el dataframe 
+~~~python
+Rest_locations=pd.DataFrame(df['location'].value_counts().reset_index())
+Rest_locations.columns=['Name','count']
+Restaurant_locations=Rest_locations.merge(locations,on='Name',how="left").dropna()
+~~~
+![img](./images/019.png)
+
+
+Separamos los valores de la longitud y latitud
+~~~python
+lat,lon=zip(*np.array(Restaurant_locations['geo_loc']))
+Restaurant_locations['lat']=lat
+Restaurant_locations['lon']=lon
+~~~
+![img](./images/020.png)
+
+Como ya no vamos a necesitar la columna `geo_loc` la borramos
+~~~python
+
+Restaurant_locations.drop("geo_loc", axis = 1, inplace = True)
+~~~
+![img](./images/021.png)
+
+Instalamos folium,  importamos y generamos un mapa base
+~~~python
+import folium
+from folium.plugins import HeatMap
+basemap=generateBaseMap()
+~~~
+
+Creamos la función `generateBaseMap` genera el mapa base
+~~~python
+def generateBaseMap(default_location=[12.97, 77.59], default_zoom_start=12):
+    base_map = folium.Map(location=default_location, zoom_start=default_zoom_start)
+    return base_map
+~~~
+Creamos un `heatmap`
+~~~python
+HeatMap(Restaurant_locations[['lat','lon','count']].values.tolist(),zoom=20,radius=15).add_to(basemap)
+~~~
